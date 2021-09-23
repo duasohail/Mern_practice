@@ -1,32 +1,31 @@
-const mongoose = require('mongoose');
+const dotenv = require('dotenv');
 const express = require('express');
 const app = express();
 
 
-//DB Connection
-const DB = 'mongodb+srv://dua_mernpractice:123dua123@cluster0.jopfe.mongodb.net/mernpractice?retryWrites=true&w=majority';
+//dotenv
+dotenv.config({ path: './config.env' });
+const PORT = process.env.PORT; //hidden server PORT
 
+//DB CONNECTION
+require('./db/conn');
 
-mongoose.connect(DB, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-}).then(() => {
-    console.log('connected');
-}).catch((err) => console.log('not connected'));
+//Route Path
+app.use(require('./router/auth'));
+
 
 //Middleware
-
 const middleware = (req, res, next) => {
     console.log('hello middleware');
     next();
 }
 
 
-
+//ROUTES
 app.get('/', (req, res) => {
     res.send('hello home welcome to MERN STACK');
 });
-app.get('/about', (req, res) => {
+app.get('/about', middleware, (req, res) => {
     res.send('hello About');
 });
 app.get('/contact', (req, res) => {
@@ -43,6 +42,8 @@ app.get('/register', (req, res) => {
 });
 
 
-app.listen(3000, () => {
-    console.log('server is running at port 3000');
+
+//server listen
+app.listen(PORT, () => {
+    console.log(`server is running at port ${PORT}`);
 })
